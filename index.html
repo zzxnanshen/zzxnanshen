@@ -1,0 +1,944 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FitHub - 你的健身伙伴</title>
+    <!-- 引入 Font Awesome 图标库 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Microsoft YaHei', sans-serif;
+            background-color: #f5f5f5;
+        }
+
+        /* 导航栏样式 */
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 2rem;
+            background: linear-gradient(135deg, #24292e, #1a1e21);
+            color: white;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+        }
+
+        /* Logo样式 */
+        .logo {
+            font-size: 2rem;
+            font-weight: bold;
+            background: linear-gradient(45deg, #ff6b6b, #ffd93d);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }
+
+        /* 导航按钮容器 */
+        .nav-buttons {
+            display: flex;
+            gap: 1rem;
+        }
+
+        /* 导航按钮样式 */
+        .nav-button {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 5px;
+            background: linear-gradient(45deg, #ff6b6b, #ffd93d);
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .nav-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(255,107,107,0.3);
+        }
+
+        .nav-button i {
+            font-size: 1.1rem;
+        }
+
+        /* 主要内容区域 */
+        .main-content {
+            margin-top: 80px;
+            padding: 2rem;
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .navbar {
+                flex-direction: column;
+                padding: 1rem;
+                position: relative;
+            }
+
+            .main-content {
+                padding-top: 180px;
+            }
+        }
+
+        /* 添加动画效果 */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .main-content {
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        /* 视频区域样式 */
+        .video-section {
+            margin-top: 3rem;
+            padding: 2rem;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.1);
+        }
+
+        .video-section h2 {
+            color: #333;
+            margin-bottom: 2rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid #ff6b6b;
+        }
+
+        .video-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            padding: 1rem;
+        }
+
+        .video-card {
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+            cursor: pointer;
+        }
+
+        .video-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .video-thumbnail {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .video-thumbnail img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            transition: transform 0.3s ease;
+        }
+
+        .video-card:hover .video-thumbnail img {
+            transform: scale(1.05);
+        }
+
+        .play-icon {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 50px;
+            height: 50px;
+            background: rgba(255,107,107,0.9);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .video-card:hover .play-icon {
+            opacity: 1;
+        }
+
+        .play-icon i {
+            color: white;
+            font-size: 1.5rem;
+        }
+
+        .video-info {
+            padding: 1rem;
+        }
+
+        .video-info h3 {
+            color: #333;
+            margin-bottom: 0.5rem;
+        }
+
+        .video-info p {
+            color: #666;
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+        }
+
+        .video-stats {
+            display: flex;
+            gap: 1rem;
+            color: #888;
+            font-size: 0.8rem;
+        }
+
+        .video-stats span {
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+
+        /* 响应式调整 */
+        @media (max-width: 768px) {
+            .video-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .video-section {
+                padding: 1rem;
+            }
+        }
+
+        /* 添加新样式 */
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .view-all-btn {
+            padding: 0.5rem 1rem;
+            background: linear-gradient(45deg, #ff6b6b, #ffd93d);
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+        .view-all-btn:hover {
+            transform: translateX(5px);
+            box-shadow: 0 2px 10px rgba(255,107,107,0.3);
+        }
+
+        .video-card {
+            text-decoration: none;
+            display: block;
+        }
+
+        /* 修改视频卡片样式 */
+        .video-section h2 {
+            margin-bottom: 0; /* 移除原来的下边距 */
+            border-bottom: none; /* 移除原来的下边框 */
+        }
+
+        /* 响应式调整 */
+        @media (max-width: 768px) {
+            .section-header {
+                flex-direction: column;
+                gap: 1rem;
+                text-align: center;
+            }
+
+            .view-all-btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+
+        /* 论坛区块样式 */
+        .forum-section {
+            margin-top: 3rem;
+            padding: 2rem;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.1);
+        }
+
+        .forum-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            padding: 1rem;
+        }
+
+        .forum-card {
+            background: white;
+            border-radius: 10px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+            cursor: pointer;
+        }
+
+        .forum-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .forum-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .username {
+            font-weight: bold;
+            color: #333;
+        }
+
+        .post-time {
+            color: #888;
+            font-size: 0.9rem;
+        }
+
+        .post-title {
+            font-size: 1.1rem;
+            color: #333;
+            margin-bottom: 0.5rem;
+        }
+
+        .post-preview {
+            color: #666;
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .post-stats {
+            display: flex;
+            gap: 1rem;
+            color: #888;
+            font-size: 0.8rem;
+            margin-bottom: 1rem;
+        }
+
+        .post-stats span {
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+
+        .tags {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .tag {
+            background: #f0f0f0;
+            padding: 0.3rem 0.8rem;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            color: #666;
+        }
+
+        /* 响应式调整 */
+        @media (max-width: 768px) {
+            .forum-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .forum-section {
+                padding: 1rem;
+            }
+        }
+
+        /* 热量计算器样式 */
+        .calculator-section {
+            margin-top: 3rem;
+            padding: 2rem;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.1);
+        }
+
+        .calculator-container {
+            display: flex;
+            gap: 2rem;
+            padding: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .food-selector {
+            flex: 1;
+            min-width: 300px;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .calc-input {
+            padding: 1rem;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .calc-input:focus {
+            border-color: #ff6b6b;
+            outline: none;
+            box-shadow: 0 0 5px rgba(255,107,107,0.3);
+        }
+
+        .weight-input {
+            position: relative;
+        }
+
+        .unit {
+            position: absolute;
+            right: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #666;
+        }
+
+        .calc-btn {
+            padding: 1rem;
+            background: linear-gradient(45deg, #ff6b6b, #ffd93d);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .calc-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(255,107,107,0.3);
+        }
+
+        .result-display {
+            flex: 1;
+            min-width: 300px;
+        }
+
+        .result-card {
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .result-header {
+            background: linear-gradient(45deg, #ff6b6b, #ffd93d);
+            color: white;
+            padding: 1rem;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .result-content {
+            padding: 2rem;
+            text-align: center;
+        }
+
+        #calorie-result {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #ff6b6b;
+            margin-bottom: 1rem;
+        }
+
+        .result-details {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+        }
+
+        .nutrient {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #666;
+        }
+
+        @media (max-width: 768px) {
+            .calculator-container {
+                flex-direction: column;
+            }
+        }
+
+        /* 商城区块样式 */
+        .shop-section {
+            margin-top: 3rem;
+            padding: 2rem;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.1);
+        }
+
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 1.5rem;
+            padding: 1rem;
+        }
+
+        .product-card {
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .product-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .product-image {
+            position: relative;
+            height: 200px;
+            overflow: hidden;
+        }
+
+        .product-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .discount-tag {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: #ff4e4e;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+        }
+
+        .product-info {
+            padding: 1rem;
+        }
+
+        .product-title {
+            font-size: 1rem;
+            color: #333;
+            margin-bottom: 0.5rem;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .product-desc {
+            font-size: 0.9rem;
+            color: #666;
+            margin-bottom: 0.5rem;
+        }
+
+        .price-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .price {
+            color: #ff4e4e;
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+
+        .sales {
+            color: #999;
+            font-size: 0.8rem;
+        }
+
+        .shop-info {
+            border-top: 1px solid #eee;
+            padding-top: 0.5rem;
+        }
+
+        .shop-name {
+            color: #666;
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+
+        .promotion-tags {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .promotion-tags .tag {
+            background: #fff2f2;
+            color: #ff4e4e;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+        }
+
+        @media (max-width: 768px) {
+            .product-grid {
+                grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 导航栏 -->
+    <nav class="navbar">
+        <a href="index.html" class="logo">FitHub</a>
+        <div class="nav-buttons">
+            <a href="videos.html" class="nav-button">
+                <i class="fas fa-play-circle"></i>
+                健身视频
+            </a>
+            <a href="forum.html" class="nav-button">
+                <i class="fas fa-comments"></i>
+                FHB论坛
+            </a>
+            <a href="calculator.html" class="nav-button">
+                <i class="fas fa-calculator"></i>
+                热量计算器
+            </a>
+            <a href="shop.html" class="nav-button">
+                <i class="fas fa-shopping-cart"></i>
+                健身用品
+            </a>
+            <a href="exam.html" class="nav-button">
+                <i class="fas fa-file-alt"></i>
+                教练考试
+            </a>
+            <a href="challenges.html" class="nav-button">
+                <i class="fas fa-trophy"></i>
+                活动挑战
+            </a>
+        </div>
+    </nav>
+
+    <!-- 主要内容区域 -->
+    <div class="main-content">
+        <h1>欢迎来到 FitHub</h1>
+        <p>你的专业健身社区</p>
+
+        <!-- 视频展示区域 -->
+        <section id="videos" class="video-section">
+            <div class="section-header">
+                <h2>精选健身视频</h2>
+                <a href="videos.html" class="view-all-btn">
+                    查看全部 <i class="fas fa-arrow-right"></i>
+                </a>
+            </div>
+            <div class="video-grid">
+                <a href="video-detail.html?id=1" class="video-card">
+                    <div class="video-thumbnail">
+                        <img src="https://via.placeholder.com/300x200" alt="健身视频1">
+                        <div class="play-icon">
+                            <i class="fas fa-play"></i>
+                        </div>
+                    </div>
+                    <div class="video-info">
+                        <h3>初级腹肌训练</h3>
+                        <p>适合初学者的15分钟腹肌训练</p>
+                        <div class="video-stats">
+                            <span><i class="fas fa-eye"></i> 1.2k</span>
+                            <span><i class="fas fa-thumbs-up"></i> 328</span>
+                        </div>
+                    </div>
+                </a>
+
+                <a href="video-detail.html?id=2" class="video-card">
+                    <div class="video-thumbnail">
+                        <img src="https://via.placeholder.com/300x200" alt="健身视频2">
+                        <div class="play-icon">
+                            <i class="fas fa-play"></i>
+                        </div>
+                    </div>
+                    <div class="video-info">
+                        <h3>全身HIIT训练</h3>
+                        <p>30分钟高强度间歇训练</p>
+                        <div class="video-stats">
+                            <span><i class="fas fa-eye"></i> 2.5k</span>
+                            <span><i class="fas fa-thumbs-up"></i> 456</span>
+                        </div>
+                    </div>
+                </a>
+
+                <a href="video-detail.html?id=3" class="video-card">
+                    <div class="video-thumbnail">
+                        <img src="https://via.placeholder.com/300x200" alt="健身视频3">
+                        <div class="play-icon">
+                            <i class="fas fa-play"></i>
+                        </div>
+                    </div>
+                    <div class="video-info">
+                        <h3>背部塑形训练</h3>
+                        <p>20分钟哑铃背部训练</p>
+                        <div class="video-stats">
+                            <span><i class="fas fa-eye"></i> 1.8k</span>
+                            <span><i class="fas fa-thumbs-up"></i> 289</span>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        </section>
+
+        <!-- 论坛区块 -->
+        <section id="forum" class="forum-section">
+            <div class="section-header">
+                <h2>FHB论坛热门讨论</h2>
+                <a href="forum.html" class="view-all-btn">
+                    进入论坛 <i class="fas fa-arrow-right"></i>
+                </a>
+            </div>
+            <div class="forum-grid">
+                <div class="forum-card">
+                    <div class="forum-header">
+                        <div class="user-info">
+                            <img src="https://via.placeholder.com/40" alt="用户头像" class="user-avatar">
+                            <span class="username">健身达人</span>
+                        </div>
+                        <span class="post-time">2小时前</span>
+                    </div>
+                    <h3 class="post-title">新手如何制定合理的健身计划？</h3>
+                    <p class="post-preview">分享一下我的健身经验，从零基础开始，如何科学合理地制定适合自己的健身计划...</p>
+                    <div class="post-stats">
+                        <span><i class="fas fa-comment"></i> 128条回复</span>
+                        <span><i class="fas fa-heart"></i> 356</span>
+                        <span><i class="fas fa-eye"></i> 1.2k</span>
+                    </div>
+                    <div class="tags">
+                        <span class="tag">健身计划</span>
+                        <span class="tag">新手指南</span>
+                    </div>
+                </div>
+
+                <div class="forum-card">
+                    <div class="forum-header">
+                        <div class="user-info">
+                            <img src="https://via.placeholder.com/40" alt="用户头像" class="user-avatar">
+                            <span class="username">营养师小王</span>
+                        </div>
+                        <span class="post-time">5小时前</span>
+                    </div>
+                    <h3 class="post-title">增肌期的营养搭配建议</h3>
+                    <p class="post-preview">详细解析增肌期应该如何安排饮食，蛋白质、碳水、脂肪的最佳比例...</p>
+                    <div class="post-stats">
+                        <span><i class="fas fa-comment"></i> 89条回复</span>
+                        <span><i class="fas fa-heart"></i> 245</span>
+                        <span><i class="fas fa-eye"></i> 892</span>
+                    </div>
+                    <div class="tags">
+                        <span class="tag">营养搭配</span>
+                        <span class="tag">增肌</span>
+                    </div>
+                </div>
+
+                <div class="forum-card">
+                    <div class="forum-header">
+                        <div class="user-info">
+                            <img src="https://via.placeholder.com/40" alt="用户头像" class="user-avatar">
+                            <span class="username">专业教练</span>
+                        </div>
+                        <span class="post-time">8小时前</span>
+                    </div>
+                    <h3 class="post-title">常见训练动作要领解析</h3>
+                    <p class="post-preview">深蹲、硬拉等基础动作的详细解析，避免错误动作导致的运动损伤...</p>
+                    <div class="post-stats">
+                        <span><i class="fas fa-comment"></i> 156条回复</span>
+                        <span><i class="fas fa-heart"></i> 428</span>
+                        <span><i class="fas fa-eye"></i> 1.5k</span>
+                    </div>
+                    <div class="tags">
+                        <span class="tag">动作要领</span>
+                        <span class="tag">训练技巧</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 热量计算器区块 -->
+        <section id="calculator" class="calculator-section">
+            <div class="section-header">
+                <h2>热量计算器</h2>
+                <a href="calculator.html" class="view-all-btn">
+                    更多食物 <i class="fas fa-arrow-right"></i>
+                </a>
+            </div>
+            <div class="calculator-container">
+                <div class="food-selector">
+                    <select id="food-select" class="calc-input">
+                        <option value="">选择食物</option>
+                        <option value="rice">白米饭 (116kcal/100g)</option>
+                        <option value="chicken">鸡胸肉 (165kcal/100g)</option>
+                        <option value="egg">鸡蛋 (155kcal/100g)</option>
+                        <option value="milk">牛奶 (66kcal/100g)</option>
+                        <option value="banana">香蕉 (89kcal/100g)</option>
+                        <option value="apple">苹果 (52kcal/100g)</option>
+                    </select>
+                    <div class="weight-input">
+                        <input type="number" id="weight-input" class="calc-input" placeholder="输入重量(g)">
+                        <span class="unit">克</span>
+                    </div>
+                    <button id="calculate-btn" class="calc-btn">
+                        <i class="fas fa-calculator"></i>
+                        计算热量
+                    </button>
+                </div>
+                <div class="result-display">
+                    <div class="result-card">
+                        <div class="result-header">计算结果</div>
+                        <div class="result-content">
+                            <div id="calorie-result">0 kcal</div>
+                            <div class="result-details">
+                                <div class="nutrient">
+                                    <i class="fas fa-fire"></i>
+                                    <span>热量</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 商城区块 -->
+        <section id="shop" class="shop-section">
+            <div class="section-header">
+                <h2>健身用品商城</h2>
+                <a href="shop.html" class="view-all-btn">
+                    更多商品 <i class="fas fa-arrow-right"></i>
+                </a>
+            </div>
+            <div class="product-grid">
+                <!-- 商品卡片 -->
+                <div class="product-card">
+                    <div class="product-image">
+                        <img src="images/protein1.jpg" alt="蛋白粉">
+                        <span class="discount-tag">限时特惠</span>
+                    </div>
+                    <div class="product-info">
+                        <h3 class="product-title">康比特增重蛋白粉 乳清蛋白粉</h3>
+                        <div class="product-desc">专为瘦人增重研发，2.3kg大包装</div>
+                        <div class="price-info">
+                            <span class="price">¥89.90</span>
+                            <span class="sales">30万+人付款</span>
+                        </div>
+                        <div class="shop-info">
+                            <span class="shop-name">康比特官方旗舰店</span>
+                            <div class="promotion-tags">
+                                <span class="tag">店铺满100减10</span>
+                                <span class="tag">赠运动水杯</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- 可以继续添加更多商品卡片 -->
+            </div>
+        </section>
+    </div>
+
+    <script>
+        // 食物热量数据（每100g的热量）
+        const foodCalories = {
+            rice: 116,
+            chicken: 165,
+            egg: 155,
+            milk: 66,
+            banana: 89,
+            apple: 52
+        };
+
+        // 获取DOM元素
+        const foodSelect = document.getElementById('food-select');
+        const weightInput = document.getElementById('weight-input');
+        const calculateBtn = document.getElementById('calculate-btn');
+        const calorieResult = document.getElementById('calorie-result');
+
+        // 添加计算事件
+        calculateBtn.addEventListener('click', calculateCalories);
+
+        function calculateCalories() {
+            const selectedFood = foodSelect.value;
+            const weight = parseFloat(weightInput.value);
+
+            if (!selectedFood || !weight) {
+                alert('请选择食物并输入重量！');
+                return;
+            }
+
+            const caloriesPer100g = foodCalories[selectedFood];
+            const totalCalories = (caloriesPer100g * weight / 100).toFixed(1);
+            
+            // 显示结果
+            calorieResult.textContent = `${totalCalories} kcal`;
+
+            // 添加动画效果
+            calorieResult.style.animation = 'none';
+            calorieResult.offsetHeight; // 触发重绘
+            calorieResult.style.animation = 'fadeIn 0.5s ease-out';
+        }
+
+        // 修改输入验证
+        weightInput.addEventListener('input', function() {
+            // 限制输入范围在0-9999之间，且最多保留1位小数
+            let value = parseFloat(this.value);
+            if (isNaN(value) || value < 0) {
+                this.value = 0;
+            } else if (value > 9999) {
+                this.value = 9999;
+            } else {
+                this.value = Math.round(value * 10) / 10; // 保留1位小数
+            }
+        });
+    </script>
+</body>
+</html> 

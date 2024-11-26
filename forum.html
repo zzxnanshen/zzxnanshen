@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FHB论坛 - FitHub</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Microsoft YaHei', sans-serif;
+            background-color: #f5f5f5;
+        }
+
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 2rem;
+            background: linear-gradient(135deg, #24292e, #1a1e21);
+            color: white;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .logo {
+            font-size: 2rem;
+            font-weight: bold;
+            background: linear-gradient(45deg, #ff6b6b, #ffd93d);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-decoration: none;
+        }
+
+        .main-content {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+
+        /* 论坛顶部操作栏 */
+        .forum-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .new-post-btn {
+            padding: 0.8rem 1.5rem;
+            background: linear-gradient(45deg, #ff6b6b, #ffd93d);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .new-post-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(255,107,107,0.3);
+        }
+
+        .search-bar {
+            display: flex;
+            gap: 1rem;
+            flex: 1;
+            max-width: 600px;
+            margin: 0 2rem;
+        }
+
+        .search-input {
+            flex: 1;
+            padding: 0.8rem;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+        }
+
+        /* 分类标签 */
+        .categories {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .category {
+            padding: 0.5rem 1rem;
+            background: white;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .category.active {
+            background: linear-gradient(45deg, #ff6b6b, #ffd93d);
+            color: white;
+        }
+
+        /* 帖子列表 */
+        .forum-posts {
+            display: grid;
+            gap: 1.5rem;
+        }
+
+        .forum-card {
+            background: white;
+            border-radius: 10px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+            cursor: pointer;
+        }
+
+        .forum-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .forum-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .username {
+            font-weight: bold;
+            color: #333;
+        }
+
+        .post-time {
+            color: #888;
+            font-size: 0.9rem;
+        }
+
+        .post-title {
+            font-size: 1.2rem;
+            color: #333;
+            margin-bottom: 0.5rem;
+        }
+
+        .post-preview {
+            color: #666;
+            margin-bottom: 1rem;
+            line-height: 1.6;
+        }
+
+        .post-stats {
+            display: flex;
+            gap: 1.5rem;
+            color: #888;
+        }
+
+        .post-stats span {
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+
+        .tags {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .tag {
+            background: #f0f0f0;
+            padding: 0.3rem 0.8rem;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            color: #666;
+        }
+
+        @media (max-width: 768px) {
+            .forum-actions {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .search-bar {
+                margin: 1rem 0;
+                width: 100%;
+                max-width: none;
+            }
+
+            .categories {
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <a href="index.html" class="logo">FitHub</a>
+        <div class="nav-buttons">
+            <a href="videos.html" class="nav-button">
+                <i class="fas fa-play-circle"></i>
+                健身视频
+            </a>
+            <a href="forum.html" class="nav-button">
+                <i class="fas fa-comments"></i>
+                FHB论坛
+            </a>
+            <a href="calculator.html" class="nav-button">
+                <i class="fas fa-calculator"></i>
+                热量计算器
+            </a>
+            <a href="shop.html" class="nav-button">
+                <i class="fas fa-shopping-cart"></i>
+                健身用品
+            </a>
+            <a href="exam.html" class="nav-button">
+                <i class="fas fa-file-alt"></i>
+                教练考试
+            </a>
+            <a href="challenges.html" class="nav-button">
+                <i class="fas fa-trophy"></i>
+                活动挑战
+            </a>
+        </div>
+    </nav>
+
+    <div class="main-content">
+        <div class="forum-actions">
+            <button class="new-post-btn">
+                <i class="fas fa-plus"></i>
+                发布新帖
+            </button>
+            <div class="search-bar">
+                <input type="text" class="search-input" placeholder="搜索帖子...">
+            </div>
+        </div>
+
+        <div class="categories">
+            <div class="category active">全部</div>
+            <div class="category">训练计划</div>
+            <div class="category">饮食营养</div>
+            <div class="category">动作技巧</div>
+            <div class="category">经验分享</div>
+            <div class="category">器材装备</div>
+        </div>
+
+        <div class="forum-posts">
+            <!-- 帖子1 -->
+            <div class="forum-card">
+                <div class="forum-header">
+                    <div class="user-info">
+                        <img src="https://via.placeholder.com/40" alt="用户头像" class="user-avatar">
+                        <span class="username">健身达人</span>
+                    </div>
+                    <span class="post-time">2小时前</span>
+                </div>
+                <h3 class="post-title">新手如何制定合理的健身计划？</h3>
+                <p class="post-preview">
+                    分享一下我的健身经验，从零基础开始，如何科学合理地制定适合自己的健身计划。首先要了解自己的身体状况和训练目标，然后根据这些因素来安排训练频率和强度...
+                </p>
+                <div class="post-stats">
+                    <span><i class="fas fa-comment"></i> 128条回复</span>
+                    <span><i class="fas fa-heart"></i> 356</span>
+                    <span><i class="fas fa-eye"></i> 1.2k</span>
+                </div>
+                <div class="tags">
+                    <span class="tag">健身计划</span>
+                    <span class="tag">新手指南</span>
+                </div>
+            </div>
+
+            <!-- 帖子2 -->
+            <div class="forum-card">
+                <div class="forum-header">
+                    <div class="user-info">
+                        <img src="https://via.placeholder.com/40" alt="用户头像" class="user-avatar">
+                        <span class="username">营养师小王</span>
+                    </div>
+                    <span class="post-time">5小时前</span>
+                </div>
+                <h3 class="post-title">增肌期的营养搭配建议</h3>
+                <p class="post-preview">
+                    详细解析增肌期应该如何安排饮食，蛋白质、碳水、脂肪的最佳比例。增肌期间的饮食安排对训练效果有着决定性的影响，合理的营养摄入能够帮助你更快达到目标...
+                </p>
+                <div class="post-stats">
+                    <span><i class="fas fa-comment"></i> 89条回复</span>
+                    <span><i class="fas fa-heart"></i> 245</span>
+                    <span><i class="fas fa-eye"></i> 892</span>
+                </div>
+                <div class="tags">
+                    <span class="tag">营养搭配</span>
+                    <span class="tag">增肌</span>
+                </div>
+            </div>
+
+            <!-- 帖子3 -->
+            <div class="forum-card">
+                <div class="forum-header">
+                    <div class="user-info">
+                        <img src="https://via.placeholder.com/40" alt="用户头像" class="user-avatar">
+                        <span class="username">专业教练</span>
+                    </div>
+                    <span class="post-time">8小时前</span>
+                </div>
+                <h3 class="post-title">常见训练动作要领解析</h3>
+                <p class="post-preview">
+                    深蹲、硬拉等基础动作的详细解析，避免错误动作导致的运动损伤。正确的动作形式不仅能提高训练效果，还能预防受伤，是健身过程中最重要的基础...
+                </p>
+                <div class="post-stats">
+                    <span><i class="fas fa-comment"></i> 156条回复</span>
+                    <span><i class="fas fa-heart"></i> 428</span>
+                    <span><i class="fas fa-eye"></i> 1.5k</span>
+                </div>
+                <div class="tags">
+                    <span class="tag">动作要领</span>
+                    <span class="tag">训练技巧</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 分类标签点击效果
+        document.querySelectorAll('.category').forEach(category => {
+            category.addEventListener('click', () => {
+                document.querySelectorAll('.category').forEach(c => c.classList.remove('active'));
+                category.classList.add('active');
+            });
+        });
+    </script>
+</body>
+</html> 

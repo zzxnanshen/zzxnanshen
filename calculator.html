@@ -1,0 +1,659 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>热量计算器 - FitHub</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Microsoft YaHei', sans-serif;
+            background-color: #f5f5f5;
+        }
+
+        /* 导航栏样式 */
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 2rem;
+            background: linear-gradient(135deg, #24292e, #1a1e21);
+            color: white;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .logo {
+            font-size: 2rem;
+            font-weight: bold;
+            background: linear-gradient(45deg, #ff6b6b, #ffd93d);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-decoration: none;
+        }
+
+        /* 导航按钮容器 */
+        .nav-buttons {
+            display: flex;
+            gap: 1rem;
+        }
+
+        /* 导航按钮样式 */
+        .nav-button {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 5px;
+            background: linear-gradient(45deg, #ff6b6b, #ffd93d);
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .nav-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(255,107,107,0.3);
+        }
+
+        .nav-button i {
+            font-size: 1.1rem;
+        }
+
+        /* 主要内容区域 */
+        .main-content {
+            max-width: 1200px;
+            margin: 80px auto 0;
+            padding: 2rem;
+        }
+
+        /* 响应式调整 */
+        @media (max-width: 768px) {
+            .navbar {
+                flex-direction: column;
+                padding: 1rem;
+            }
+
+            .nav-buttons {
+                flex-wrap: wrap;
+                justify-content: center;
+                margin-top: 1rem;
+            }
+
+            .nav-button {
+                font-size: 0.9rem;
+                padding: 0.4rem 0.8rem;
+            }
+
+            .main-content {
+                margin-top: 140px;
+                padding: 1rem;
+            }
+        }
+
+        .bmr-calculator {
+            background: white;
+            border-radius: 10px;
+            padding: 2rem;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.1);
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .gender-select {
+            display: flex;
+            gap: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        .gender-select label {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
+        }
+
+        .radio-label {
+            font-size: 1.1rem;
+            color: #333;
+        }
+
+        .input-field {
+            position: relative;
+        }
+
+        .input-field label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #333;
+        }
+
+        .calc-input {
+            width: 100%;
+            padding: 0.8rem;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .calc-input:focus {
+            border-color: #ff6b6b;
+            outline: none;
+            box-shadow: 0 0 5px rgba(255,107,107,0.3);
+        }
+
+        .unit {
+            position: absolute;
+            right: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #666;
+        }
+
+        .calc-btn {
+            padding: 1rem;
+            background: linear-gradient(45deg, #ff6b6b, #ffd93d);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .calc-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(255,107,107,0.3);
+        }
+
+        .result-card {
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .result-header {
+            background: linear-gradient(45deg, #ff6b6b, #ffd93d);
+            color: white;
+            padding: 1rem;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .result-content {
+            padding: 2rem;
+            text-align: center;
+        }
+
+        #bmr-result {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #ff6b6b;
+            margin-bottom: 1rem;
+        }
+
+        .result-explanation {
+            color: #666;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+
+        @media (max-width: 768px) {
+            .bmr-calculator {
+                padding: 1rem;
+            }
+        }
+
+        .result-note {
+            margin-top: 1rem;
+            padding: 1rem;
+            background: rgba(255, 107, 107, 0.1);
+            border-radius: 5px;
+            display: flex;
+            align-items: flex-start;
+            gap: 0.5rem;
+            color: #ff6b6b;
+            font-size: 0.9rem;
+            line-height: 1.4;
+        }
+
+        .result-note i {
+            margin-top: 0.2rem;
+        }
+
+        .result-note p {
+            margin: 0;
+            flex: 1;
+        }
+
+        .food-calculator {
+            background: white;
+            border-radius: 10px;
+            padding: 2rem;
+            margin-top: 2rem;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.1);
+        }
+
+        .food-list {
+            margin-top: 2rem;
+            padding-top: 1rem;
+            border-top: 1px solid #eee;
+        }
+
+        .added-foods {
+            margin: 1rem 0;
+        }
+
+        .food-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.8rem;
+            background: #f8f9fa;
+            border-radius: 5px;
+            margin-bottom: 0.5rem;
+        }
+
+        .food-info {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .food-name {
+            font-weight: bold;
+            color: #333;
+        }
+
+        .food-weight {
+            color: #666;
+        }
+
+        .food-calories {
+            color: #ff6b6b;
+            font-weight: bold;
+        }
+
+        .calorie-gap {
+            margin-top: 2rem;
+            padding: 1rem;
+            background: #f8f9fa;
+            border-radius: 5px;
+        }
+
+        .calorie-gap h3 {
+            color: #333;
+            margin-bottom: 0.5rem;
+        }
+
+        #calorie-gap {
+            color: #ff6b6b;
+            font-weight: bold;
+        }
+
+        .gap-explanation {
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        .food-calories-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .delete-btn {
+            background: none;
+            border: none;
+            color: #ff6b6b;
+            cursor: pointer;
+            padding: 0.2rem;
+            transition: all 0.3s ease;
+        }
+
+        .delete-btn:hover {
+            transform: scale(1.2);
+        }
+
+        .suggestions {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            max-height: 200px;
+            overflow-y: auto;
+            z-index: 1000;
+            display: none;
+        }
+
+        .suggestion-item {
+            padding: 0.5rem 1rem;
+            cursor: pointer;
+        }
+
+        .suggestion-item:hover {
+            background: #f0f0f0;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <a href="index.html" class="logo">FitHub</a>
+        <div class="nav-buttons">
+            <a href="videos.html" class="nav-button">
+                <i class="fas fa-play-circle"></i>
+                健身视频
+            </a>
+            <a href="forum.html" class="nav-button">
+                <i class="fas fa-comments"></i>
+                FHB论坛
+            </a>
+            <a href="calculator.html" class="nav-button">
+                <i class="fas fa-calculator"></i>
+                热量计算器
+            </a>
+            <a href="shop.html" class="nav-button">
+                <i class="fas fa-shopping-cart"></i>
+                健身用品
+            </a>
+            <a href="exam.html" class="nav-button">
+                <i class="fas fa-file-alt"></i>
+                教练考试
+            </a>
+            <a href="challenges.html" class="nav-button">
+                <i class="fas fa-trophy"></i>
+                活动挑战
+            </a>
+        </div>
+    </nav>
+
+    <div class="main-content">
+        <div class="calculator-section">
+            <h2>基础代谢率(BMR)计算器</h2>
+            <div class="bmr-calculator">
+                <div class="input-group">
+                    <div class="gender-select">
+                        <label>
+                            <input type="radio" name="gender" value="male" checked>
+                            <span class="radio-label">男</span>
+                        </label>
+                        <label>
+                            <input type="radio" name="gender" value="female">
+                            <span class="radio-label">女</span>
+                        </label>
+                    </div>
+                    <div class="input-field">
+                        <label>年龄(1岁或以上)*</label>
+                        <input type="number" id="age" min="1" class="calc-input" required>
+                        <span class="unit">岁</span>
+                    </div>
+                    <div class="input-field">
+                        <label>身高*</label>
+                        <input type="number" id="height" class="calc-input" required>
+                        <span class="unit">厘米</span>
+                    </div>
+                    <div class="input-field">
+                        <label>体重*</label>
+                        <input type="number" id="weight" class="calc-input" required>
+                        <span class="unit">千克</span>
+                    </div>
+                    <button id="calculate-bmr" class="calc-btn">
+                        <i class="fas fa-calculator"></i>
+                        计算BMR
+                    </button>
+                </div>
+                <div class="result-display">
+                    <div class="result-card">
+                        <div class="result-header">计算结果</div>
+                        <div class="result-content">
+                            <div id="bmr-result">0 kcal/天</div>
+                            <p class="result-explanation">这是您在完全休息状态下，维持基本生命活动所需的热量</p>
+                            <div class="result-note">
+                                <i class="fas fa-info-circle"></i>
+                                <p>温馨提示：每天的热量缺口尽量控制在800以下，身体健康不反弹</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="calculator-section">
+            <h2>每日热量计算（多次添加）</h2>
+            <div class="food-calculator">
+                <div class="input-group">
+                    <div class="input-field">
+                        <input type="text" id="food-name" class="calc-input" placeholder="输入食物名称">
+                    </div>
+                    <div class="input-field">
+                        <input type="number" id="food-weight" class="calc-input" placeholder="输入食物重量(克)">
+                        <span class="unit">克</span>
+                    </div>
+                    <button id="add-food-btn" class="calc-btn">
+                        <i class="fas fa-plus"></i>
+                        计算热量
+                    </button>
+                </div>
+
+                <div class="food-list">
+                    <h3>已添加的食物:</h3>
+                    <div id="added-foods" class="added-foods">
+                        <!-- 这里会动态添加食物列表 -->
+                    </div>
+                    <div class="calorie-gap">
+                        <h3>热量缺口：<span id="calorie-gap">0</span> kcal</h3>
+                        <p class="gap-explanation">（基础代谢 - 已摄入热量）</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 食物热量数据库
+        const foodCalories = {
+            '米饭': 116,
+            '面包': 265,
+            '鸡胸肉': 165,
+            '鸡蛋': 155,
+            '牛奶': 66,
+            '香蕉': 89,
+            '苹果': 52,
+            '西兰花': 34,
+            '三文鱼': 206,
+            '牛肉': 250,
+            '豆腐': 76,
+            '花生': 567,
+            '酸奶': 60,
+            '玉米': 96,
+            '燕麦': 389,
+            '全麦面包': 247,
+            '鸡蛋白': 52,
+            '金枪鱼': 184
+        };
+
+        // 获取DOM元素
+        const foodNameInput = document.getElementById('food-name');
+        const foodWeightInput = document.getElementById('food-weight');
+        const addFoodBtn = document.getElementById('add-food-btn');
+        const addedFoodsDiv = document.getElementById('added-foods');
+        const calorieGapSpan = document.getElementById('calorie-gap');
+        const calculateBmrBtn = document.getElementById('calculate-bmr');
+
+        let totalCaloriesConsumed = 0;
+        let bmrValue = 0; // 存储BMR计算结果
+
+        // BMR计算函数
+        calculateBmrBtn.addEventListener('click', function() {
+            const gender = document.querySelector('input[name="gender"]:checked').value;
+            const age = parseFloat(document.getElementById('age').value);
+            const height = parseFloat(document.getElementById('height').value);
+            const weight = parseFloat(document.getElementById('weight').value);
+
+            if (!age || !height || !weight) {
+                alert('请填写所有必填项！');
+                return;
+            }
+
+            let bmr;
+            if (gender === 'male') {
+                // 男性BMR计算公式
+                bmr = 66 + (13.7 * weight) + (5 * height) - (6.8 * age);
+            } else {
+                // 女性BMR计算公式
+                bmr = 655 + (9.6 * weight) + (1.8 * height) - (4.7 * age);
+            }
+
+            bmrValue = Math.round(bmr); // 保存BMR值
+            document.getElementById('bmr-result').textContent = `${bmrValue} kcal/天`;
+            updateCalorieGap(); // 更新热量缺口
+        });
+
+        // 添加食物
+        addFoodBtn.addEventListener('click', () => {
+            const foodName = foodNameInput.value.trim();
+            const foodWeight = parseFloat(foodWeightInput.value);
+
+            if (!bmrValue) {
+                alert('请先计算基础代谢率(BMR)！');
+                return;
+            }
+
+            if (!foodName || !foodWeight) {
+                alert('请输入食物名称和重量！');
+                return;
+            }
+
+            // 检查食物是否在数据库中
+            if (!(foodName in foodCalories)) {
+                alert('抱歉，未找到该食物的热量数据！');
+                return;
+            }
+
+            const caloriesPer100g = foodCalories[foodName];
+            const calories = Math.round((caloriesPer100g * foodWeight) / 100);
+
+            // 创建食物项
+            const foodItem = document.createElement('div');
+            foodItem.className = 'food-item';
+            foodItem.innerHTML = `
+                <div class="food-info">
+                    <span class="food-name">${foodName}</span>
+                    <span class="food-weight">${foodWeight}克</span>
+                </div>
+                <div class="food-calories-info">
+                    <span class="food-calories">${calories} kcal</span>
+                    <button class="delete-btn" onclick="deleteFood(this, ${calories})">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            `;
+
+            addedFoodsDiv.appendChild(foodItem);
+
+            // 更新总热量和热量缺口
+            totalCaloriesConsumed += calories;
+            updateCalorieGap();
+
+            // 清空输入框
+            foodNameInput.value = '';
+            foodWeightInput.value = '';
+        });
+
+        // 删除食物
+        function deleteFood(btn, calories) {
+            btn.closest('.food-item').remove();
+            totalCaloriesConsumed -= calories;
+            updateCalorieGap();
+        }
+
+        // 更新热量缺口
+        function updateCalorieGap() {
+            const gap = bmrValue - totalCaloriesConsumed;
+            calorieGapSpan.textContent = gap;
+            
+            // 根据缺口大小改变颜色
+            if (gap < -800) {
+                calorieGapSpan.style.color = '#ff4444'; // 红色警告
+            } else if (gap < 0) {
+                calorieGapSpan.style.color = '#ff8800'; // 橙色警告
+            } else {
+                calorieGapSpan.style.color = '#44bb44'; // 绿色正常
+            }
+        }
+
+        // 添加输入建议功能
+        foodNameInput.addEventListener('input', function() {
+            const value = this.value.trim();
+            if (value.length > 0) {
+                const suggestions = Object.keys(foodCalories).filter(food => 
+                    food.includes(value)
+                );
+                showSuggestions(suggestions);
+            } else {
+                hideSuggestions();
+            }
+        });
+
+        // 显示建议列表
+        function showSuggestions(suggestions) {
+            let suggestionBox = document.getElementById('suggestions');
+            if (!suggestionBox) {
+                suggestionBox = document.createElement('div');
+                suggestionBox.id = 'suggestions';
+                suggestionBox.className = 'suggestions';
+                foodNameInput.parentNode.appendChild(suggestionBox);
+            }
+
+            suggestionBox.innerHTML = suggestions.map(s => 
+                `<div class="suggestion-item" onclick="selectSuggestion('${s}')">${s}</div>`
+            ).join('');
+
+            if (suggestions.length > 0) {
+                suggestionBox.style.display = 'block';
+            } else {
+                suggestionBox.style.display = 'none';
+            }
+        }
+
+        // 隐藏建议列表
+        function hideSuggestions() {
+            const suggestionBox = document.getElementById('suggestions');
+            if (suggestionBox) {
+                suggestionBox.style.display = 'none';
+            }
+        }
+
+        // 选择建议
+        function selectSuggestion(food) {
+            foodNameInput.value = food;
+            hideSuggestions();
+        }
+    </script>
+</body>
+</html> 
